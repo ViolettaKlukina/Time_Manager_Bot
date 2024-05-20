@@ -111,6 +111,7 @@ def insert_gtd(values):
     execute_query(sql_query, values)
 
 
+
 def update_row_value_gtd(user_id, column_name, new_value):
     if is_value_in_table('gtd', 'user_id', user_id):
         sql_query = f'UPDATE gtd SET {column_name} = ? WHERE user_id = {user_id}'
