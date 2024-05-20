@@ -3,7 +3,7 @@ import logging
 #from config import LOGS, DB_FILE
 
 LOGS = '1.txt' 
-DB_FILE = 'узнайте в config.'
+DB_FILE = 'dbtest.db'
 
 
 logging.basicConfig(filename=LOGS,
@@ -60,7 +60,7 @@ def create_database():
         with sqlite3.connect(path_to_db) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                CREATE TABLE IF NOT EXISTS plan_systems (
+                CREATE TABLE IF NOT EXISTS plan_system (
                 id INTEGER PRIMARY KEY,
                 user_id INTEGER,
                 system TEXT);
@@ -72,7 +72,7 @@ def create_database():
     
 
 def insert_database(values):
-    columns = '(user_id, plan_system)'
+    columns = '(user_id, system)'
     sql_query = f"INSERT INTO plan_system {columns} VALUES (?, ?)"
     execute_query(sql_query, values)
 
@@ -80,7 +80,7 @@ def insert_database(values):
 def change_plan_system(user_id, plan_system_new):
     con = sqlite3.connect(path_to_db)
     cur = con.cursor()
-    sql_query = f"UPDATE plan_systems SET system = ? WHERE user_id = ?;"
+    sql_query = f"UPDATE plan_system SET system = ? WHERE user_id = ?;"
     cur.execute(sql_query, (plan_system_new, user_id))
     con.commit() 
     con.close() 
