@@ -1,9 +1,8 @@
 import sqlite3
 import logging
-#from config import LOGS, DB_FILE
+from config import LOGS, DB_FILE
 
-LOGS = '1.txt' 
-DB_FILE = 'dbtest.db'
+
 
 
 logging.basicConfig(filename=LOGS,
@@ -189,7 +188,7 @@ def create_db_matrix():
 
 def insert_matrix(values):
     columns = '(user_id, imp_urg, imp_nonur, unimp_urg, unimp_nonurg)'
-    sql_query = f"INSERT INTO matrix {columns} VALUES (?, ?, ?, ?)"
+    sql_query = f"INSERT INTO matrix {columns} VALUES (?, ?, ?, ?, ?)"
     execute_query(sql_query, values)
 
 
