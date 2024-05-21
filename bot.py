@@ -123,9 +123,9 @@ def kanban_go(message):
         msg = bot.send_message(message.chat.id, f'<i>что надо сделать?</i>',
                                parse_mode='html', reply_markup=markup_no)
         bot.register_next_step_handler(msg, kanban_insert_will_do)
-    elif message.text == kanban_men[3]:
-        menu(message)
     elif message.text == kanban_men[4]:
+        menu(message)
+    elif message.text == kanban_men[3]:
         kanban_plans(message)
     else:
         msg = bot.send_message(message.chat.id, f'<i>Введи что сделано, что делается и что надо сделать:</i>',
@@ -185,9 +185,9 @@ def matrix_go(message):
         msg = bot.send_message(message.chat.id, f'Какие у вас неважные несрочные задачи?',
                                parse_mode='html', reply_markup=markup_no)
         bot.register_next_step_handler(msg, matrix_insert_non_imp_non_urg)
-    elif message.text == matrix_men[4]:
-        menu(message)
     elif message.text == matrix_men[5]:
+        menu(message)
+    elif message.text == matrix_men[4]:
         matrix_plans(message)
     else:
         msg = bot.send_message(message.chat.id, f'Введите задачи: важные срочные, важные несрочные, неважные срочные, неважные несрочные.',
