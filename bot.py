@@ -125,6 +125,8 @@ def kanban_go(message):
         bot.register_next_step_handler(msg, kanban_insert_will_do)
     elif message.text == kanban_men[3]:
         menu(message)
+    elif message.text == kanban_men[4]:
+        kanban_plans(message)
     else:
         msg = bot.send_message(message.chat.id, f'<i>Введи что сделано, что делается и что надо сделать:</i>',
                                parse_mode='html', reply_markup=buttons(kanban_men))
@@ -147,6 +149,12 @@ def kanban_insert_doing(message):
 
 def kanban_insert_will_do(message):
     update_row_value_kanban(message.chat.id, 'will do', message.text)
+    msg = bot.send_message(message.chat.id, f'<i>Введи что сделано, что делается и что надо сделать:</i>',
+                           parse_mode='html', reply_markup=buttons(kanban_men))
+    bot.register_next_step_handler(msg, kanban_go)
+
+def kanban_insert_done(message):
+    update_row_value_kanban(message.chat.id, 'done', message.text)
     msg = bot.send_message(message.chat.id, f'<i>Введи что сделано, что делается и что надо сделать:</i>',
                            parse_mode='html', reply_markup=buttons(kanban_men))
     bot.register_next_step_handler(msg, kanban_go)
@@ -179,6 +187,8 @@ def matrix_go(message):
         bot.register_next_step_handler(msg, matrix_insert_non_imp_non_urg)
     elif message.text == matrix_men[4]:
         menu(message)
+    elif message.text == matrix_men[5]:
+        matrix_plans(message)
     else:
         msg = bot.send_message(message.chat.id, f'Введите задачи: важные срочные, важные несрочные, неважные срочные, неважные несрочные.',
                                parse_mode='html', reply_markup=buttons(matrix_men))
@@ -214,3 +224,10 @@ def matrix_insert_non_imp_non_urg(message):
                            f'Введите задачи: важные срочные, важные несрочные, неважные срочные, неважные несрочные.',
                            parse_mode='html', reply_markup=buttons(matrix_men))
     bot.register_next_step_handler(msg, matrix_go)
+
+
+def matrix_plans(message):
+    user_id = message.from_user.id
+    matrix_messages = select_matrix(user_id)
+    s, m, g, h = matrix_messages
+    bot.send_message(user_id, f'Важное срочное: {s}\nВажное несрочное: {m}\nНеважное срочное: {g}\nНеважное несрочное: {h}')
