@@ -153,6 +153,64 @@ def kanban_insert_will_do(message):
 
 
 # МАТРИЦА ЭЙЗЕНХАУЭРА
-# тут можно взять принцип из КАНБАНА
-def matric_menu(message):
-    pass
+def matrix_menu(message):
+    msg = bot.send_message(message.chat.id, f'Введите задачи: важные срочные, важные несрочные, неважные срочные, неважные несрочные.',
+                            parse_mode='html', reply_markup=buttons(matrix_men))
+    insert_matrix([message.chat.id, '', '', '', ''])
+    bot.register_next_step_handler(msg, matrix_go)
+
+
+def matrix_go(message):
+    if message.text == matrix_men[0]:
+        msg = bot.send_message(message.chat.id, f'Какие у вас есть важные срочные задачи?',
+                               parse_mode='html', reply_markup=markup_no)
+        bot.register_next_step_handler(msg, matrix_insert_imp_urg)
+    elif message.text == matrix_men[1]:
+        msg = bot.send_message(message.chat.id, f'Какие у вас есть важные несрочные задачи?',
+                               parse_mode='html', reply_markup=markup_no)
+        bot.register_next_step_handler(msg, matrix_insert_imp_non_urg)
+    elif message.text == matrix_men[2]:
+        msg = bot.send_message(message.chat.id, f'Какие у вас есть неважные срочные задачи?',
+                               parse_mode='html', reply_markup=markup_no)
+        bot.register_next_step_handler(msg, matrix_insert_non_imp_urg)
+    elif message.text == matrix_men[3]:
+        msg = bot.send_message(message.chat.id, f'Какие у вас неважные несрочные задачи?',
+                               parse_mode='html', reply_markup=markup_no)
+        bot.register_next_step_handler(msg, matrix_insert_non_imp_non_urg)
+    elif message.text == matrix_men[4]:
+        menu(message)
+    else:
+        msg = bot.send_message(message.chat.id, f'Введите задачи: важные срочные, важные несрочные, неважные срочные, неважные несрочные.',
+                               parse_mode='html', reply_markup=buttons(matrix_men))
+        bot.register_next_step_handler(msg, matrix_go)
+
+
+def matrix_insert_imp_urg(message):
+    update_row_value_matrix(message.chat.id, 'imp_urg', message.text)
+    msg = bot.send_message(message.chat.id, f'Введите задачи: важные срочные, важные несрочные, неважные срочные, неважные несрочные.',
+                           parse_mode='html', reply_markup=buttons(matrix_men))
+    bot.register_next_step_handler(msg, matrix_go)
+
+
+def matrix_insert_imp_non_urg(message):
+    update_row_value_matrix(message.chat.id, 'imp_nonur', message.text)
+    msg = bot.send_message(message.chat.id,
+                           f'Введите задачи: важные срочные, важные несрочные, неважные срочные, неважные несрочные.',
+                           parse_mode='html', reply_markup=buttons(matrix_men))
+    bot.register_next_step_handler(msg, matrix_go)
+
+
+def matrix_insert_non_imp_urg(message):
+    update_row_value_matrix(message.chat.id, 'unimp_urg', message.text)
+    msg = bot.send_message(message.chat.id,
+                           f'Введите задачи: важные срочные, важные несрочные, неважные срочные, неважные несрочные.',
+                           parse_mode='html', reply_markup=buttons(matrix_men))
+    bot.register_next_step_handler(msg, matrix_go)
+
+
+def matrix_insert_non_imp_non_urg(message):
+    update_row_value_matrix(message.chat.id, 'unimp_urg', message.text)
+    msg = bot.send_message(message.chat.id,
+                           f'Введите задачи: важные срочные, важные несрочные, неважные срочные, неважные несрочные.',
+                           parse_mode='html', reply_markup=buttons(matrix_men))
+    bot.register_next_step_handler(msg, matrix_go)
