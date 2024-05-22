@@ -1,5 +1,5 @@
 MAX_USERS = 10
-BOT_TOKEN = ""
+BOT_TOKEN = "6926752608:AAGyQmnRzYEF6eaNUGDA3SxOrSJ09DvRHxg"
 
 folder_id = ''
 iam_token = ''
