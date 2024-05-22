@@ -1,10 +1,6 @@
 import sqlite3
 import logging
-#from config import LOGS, DB_FILE
-
-LOGS = '1.txt' 
-DB_FILE = 'dbtest.db'
-
+from config import LOGS, DB_FILE
 
 logging.basicConfig(filename=LOGS,
                     level=logging.DEBUG,
