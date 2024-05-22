@@ -12,6 +12,7 @@ logging.basicConfig(filename=LOGS,
 
 path_to_db = DB_FILE
 
+
 def execute_query(query, data=None):
     try:
         connection = sqlite3.connect(path_to_db)
@@ -28,6 +29,7 @@ def execute_query(query, data=None):
 
     finally:
         connection.close()
+
 
 # Функция для выполнения любого sql-запроса для получения данных (возвращает значение)
 def execute_selection_query(sql_query, data=None):
