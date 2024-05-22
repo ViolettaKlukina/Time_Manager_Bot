@@ -71,7 +71,52 @@ def change_plan(message):
 
 # GTD
 #Вета можешь здесь писать
+def GTD_menu(message):
+    msg = bot.send_message(message.chat.id, f'<i>Поставь задачи на месяц или на неделю:</i>',
+                           parse_mode='html', reply_markup=buttons(GTD_men))
+    insert_gtd([message.chat.id, '', ''])
+    bot.register_next_step_handler(msg, GTD_go)
 
+
+def GTD_go(message):
+    if message.text == GTD_men[0]:
+        msg = bot.send_message(message.chat.id, f'<i>Какие задачи на месяц? (пиши по одной задаче)</i>',
+                               parse_mode='html', reply_markup=markup_no)
+        bot.register_next_step_handler(msg, insert_gtd_main_task)
+    elif message.text == GTD_men[1]:
+        msg = bot.send_message(message.chat.id, f'<i>Какие задачи на неделю? (пиши по одной задаче)</i>',
+                               parse_mode='html', reply_markup=markup_no)
+        bot.register_next_step_handler(msg, insert_gtd_task)
+    elif message.text == GTD_men[2]:
+        menu(message)
+    elif message.text == GTD_men[3]:
+        GTD_plans(message)
+    else:
+        msg = bot.send_message(message.chat.id, f'<i>Поставь задачи на месяц или на неделю:</i>',
+                               parse_mode='html', reply_markup=buttons(GTD_men))
+        bot.register_next_step_handler(msg, GTD_go)
+
+
+def insert_gtd_main_task(message):
+    update_row_value_gtd(message.chat.id, 'main_task', message.text)
+    msg = bot.send_message(message.chat.id, f'<i>Введи задачу на месяц:</i>',
+                           parse_mode='html', reply_markup=buttons(GTD_men))
+    bot.register_next_step_handler(msg, GTD_go)
+
+
+def insert_gtd_task(message):
+    update_row_value_gtd(message.chat.id, 'task', message.text)
+    msg = bot.send_message(message.chat.id, f'<i>Введи задачу на неделю:</i>',
+                           parse_mode='html', reply_markup=buttons(GTD_men))
+    bot.register_next_step_handler(msg, GTD_go)
+
+
+def gtd_plans(message):
+    user_id = message.from_user.id
+    gtd_messages = select_gtd(user_id)
+    s, m = gtd_messages
+    bot.send_message(user_id, f'Задачи на месяц: {s}\nЗадачи на неделю: {m}')
+    
 
 #POMODORO
 def pomidoro_menu(message):
