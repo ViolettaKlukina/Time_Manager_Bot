@@ -55,10 +55,13 @@ def change_plan(message):
         pomidoro_menu(message)
     elif message.text == Systems_plan[2]:
         pass
+        insert_database([message.chat.id, Systems_plan[2]])
     elif message.text == Systems_plan[1]:
         kanban_menu(message)
+        insert_database([message.chat.id, Systems_plan[1]])
     elif message.text == Systems_plan[0]:
         pass# путь в часть GTD
+        insert_database([message.chat.id, Systems_plan[0]])
     elif message.text == Systems_plan[4]:
         menu(message)
     else:
