@@ -4,7 +4,7 @@ from config import *
 import time
 from db import *
 
-#подготовка
+# подготовка
 bot = telebot.TeleBot(BOT_TOKEN)
 create_database()
 create_db_gtd()
@@ -13,9 +13,9 @@ create_db_matrix()
 create_db_reminder()
 
 
-#кнопки
+# кнопки
 def buttons(task):
-    markup = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
+    markup = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True, one_time_keyboard=True)
     for i in task:
         markup.add(i)
     return markup
@@ -23,15 +23,17 @@ def buttons(task):
 
 markup_no = types.ReplyKeyboardRemove()
 
-#меню и начало
+
+# меню и начало
 @bot.message_handler(commands=['start'])
 def handler_start(message):
     name = message.chat.first_name
     msg = bot.send_message(message.chat.id, f'<b>Привет, {name}\n</b>'
-                                                      f'<i>я бот, в котором можно выбрать удобную\n'
-                                                      f'систему планирования и контролировать свои задачи</i>',
+                                                 f'<i>я бот, в котором можно выбрать удобную\n'
+                                                 f'систему планирования и контролировать свои задачи</i>',
                                      parse_mode='html', reply_markup=buttons(menu))
     bot.register_next_step_handler(msg, menu_go)
+
 
 def menu(message):
     msg = bot.send_message(message.chat.id, f'<i>меню</i>',
@@ -60,7 +62,7 @@ def change_plan(message):
         kanban_menu(message)
         insert_database([message.chat.id, Systems_plan[1]])
     elif message.text == Systems_plan[0]:
-        pass# путь в часть GTD
+        GTD_menu(message)
         insert_database([message.chat.id, Systems_plan[0]])
     elif message.text == Systems_plan[4]:
         menu(message)
@@ -69,8 +71,8 @@ def change_plan(message):
                                parse_mode='html', reply_markup=buttons(Systems_plan))
         bot.register_next_step_handler(msg, change_plan)
 
+
 # GTD
-#Вета можешь здесь писать
 def GTD_menu(message):
     msg = bot.send_message(message.chat.id, f'<i>Поставь задачи на месяц или на неделю:</i>',
                            parse_mode='html', reply_markup=buttons(GTD_men))
@@ -90,7 +92,7 @@ def GTD_go(message):
     elif message.text == GTD_men[2]:
         menu(message)
     elif message.text == GTD_men[3]:
-        GTD_plans(message)
+        gtd_plans(message)
     else:
         msg = bot.send_message(message.chat.id, f'<i>Поставь задачи на месяц или на неделю:</i>',
                                parse_mode='html', reply_markup=buttons(GTD_men))
@@ -201,11 +203,12 @@ def kanban_insert_will_do(message):
                            parse_mode='html', reply_markup=buttons(kanban_men))
     bot.register_next_step_handler(msg, kanban_go)
 
-def kanban_insert_done(message):
-    update_row_value_kanban(message.chat.id, 'done', message.text)
-    msg = bot.send_message(message.chat.id, f'<i>Введи что сделано, что делается и что надо сделать:</i>',
-                           parse_mode='html', reply_markup=buttons(kanban_men))
-    bot.register_next_step_handler(msg, kanban_go)
+def kanban_plans(message):
+    user_id = message.from_user.id
+    matrix_messages = select_matrix(user_id)
+    s, m, g = matrix_messages
+    bot.send_message(user_id,
+                     f'Что сделано:\n{s}\nЧто делается:\n{m}\nЧто надо сделать:\n{g}')
 
 
 # МАТРИЦА ЭЙЗЕНХАУЭРА
@@ -278,4 +281,19 @@ def matrix_plans(message):
     user_id = message.from_user.id
     matrix_messages = select_matrix(user_id)
     s, m, g, h = matrix_messages
-    bot.send_message(user_id, f'Важное срочное: {s}\nВажное несрочное: {m}\nНеважное срочное: {g}\nНеважное несрочное: {h}')
+    bot.send_message(user_id, f'Важное срочное:\n{s}\nВажное несрочное:\n{m}\nНеважное срочное:\n{g}\nНеважное несрочное: {h}')
+
+# обучение
+def study_menu(message):
+    msg = bot.send_message(message.chat.id,
+                           f'можете пройти мини-обучение по боту или спросить о планировании',
+                           parse_mode='html', reply_markup=buttons(study_men))
+    bot.register_next_step_handler(msg, study_go)
+
+def study_go(message):
+    if message.text == study_men[0]:
+        pass
+    elif message.text == study_men[1]:
+        pass
+    elif message.text == study_men[2]:
+        menu(message)

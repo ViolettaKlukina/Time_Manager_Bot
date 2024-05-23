@@ -5,7 +5,7 @@ import os
 import json
 import time
 
-logging.basicConfig(filename=LOGS_FILE, level=logging.ERROR, format="%(asctime)s FILE: %(filename)s IN: %(funcName)s MESSAGE: %(message)s", filemode="w")
+logging.basicConfig(filename=LOGS, level=logging.ERROR, format="%(asctime)s FILE: %(filename)s IN: %(funcName)s MESSAGE: %(message)s", filemode="w")
 
 SYSTEM_PROMPT = [{'role': 'system', 'text': 'Ты - дружелюбный помощник по планированию.'
                                             'Отвечай пользователю только по вопросам, связанными с планированием и тайм-менеджментом.'
@@ -120,7 +120,6 @@ def ask_gpt(messages):
 
 def get_creds():
     """Получение токена и folder_id из yandex cloud command line interface"""
-
     with open(TOKEN_PATH, 'r') as f:
         d = json.load(f)
         iam_token = d["access_token"]
