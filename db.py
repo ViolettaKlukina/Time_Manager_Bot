@@ -334,7 +334,7 @@ def its_time(now_time:str):
     now_need = []
     for value in values:
         if now_time == value[1]:
-            now_need += value
+            now_need.append(value)
     return now_need
             
 

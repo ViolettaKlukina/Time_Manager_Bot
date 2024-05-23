@@ -8,8 +8,12 @@ import time
 logging.basicConfig(filename=LOGS, level=logging.ERROR, format="%(asctime)s FILE: %(filename)s IN: %(funcName)s MESSAGE: %(message)s", filemode="w")
 
 SYSTEM_PROMPT = [{'role': 'system', 'text': 'Ты - дружелюбный помощник по планированию.'
-                                            'Отвечай пользователю только по вопросам, связанными с планированием и тайм-менеджментом.'
+                                            'Отвечай пользователю только по вопросам, связанными с планированием, тайм-менеджментом и так же используя системы планирвоания: '
+                                            'Канбан,'
+                                            'МАТРИЦА ЭЙЗЕНХАУЭРА,'
+                                            'Распределение задач на месяца и недели.'
                                             'Отвечай одним-тремя предложениями, кратко и по делу.'}]
+
 
 def count_gpt_tokens(messages):
     iam_token, folder_id = get_creds()

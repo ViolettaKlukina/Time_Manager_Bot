@@ -3,6 +3,7 @@ from telebot import types
 from config import *
 import time
 from db import *
+from yandex_gpt import *
 
 # подготовка
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -292,8 +293,18 @@ def study_menu(message):
 
 def study_go(message):
     if message.text == study_men[0]:
-        pass
+        msg = bot.send_message(message.chat.id,
+                               f'Напишите свой вопрос',
+                               parse_mode='html')
+        bot.register_next_step_handler(msg, study_gpt)
     elif message.text == study_men[1]:
         pass
     elif message.text == study_men[2]:
         menu(message)
+
+
+def study_gpt(message):
+    fil, ans, count = ask_gpt(message)
+    msg = bot.send_message(message.chat.id, ans, reply_markup=buttons(study_men))
+    bot.register_next_step_handler(msg, study_go)
+
