@@ -287,7 +287,7 @@ def matrix_plans(message):
 # обучение
 def study_menu(message):
     msg = bot.send_message(message.chat.id,
-                           f'можете пройти мини-обучение по боту или спросить о планировании',
+                           f'Вы можете пройти мини-обучение по боту или спросить о планировании',
                            parse_mode='html', reply_markup=buttons(study_men))
     bot.register_next_step_handler(msg, study_go)
 
@@ -298,9 +298,116 @@ def study_go(message):
                                parse_mode='html')
         bot.register_next_step_handler(msg, study_gpt)
     elif message.text == study_men[1]:
-        pass
+        study(message)
     elif message.text == study_men[2]:
         menu(message)
+
+def study(message):
+    msg = bot.send_message(message.chat.id, f'Поздравляем! Вы начали мини-обучение по системам планирования.',
+                           parse_mode='html', reply_markup=markup_no)
+    bot.register_next_step_handler(msg, study_GTD)
+
+
+def study_GTD(message):
+    msg = bot.send_message(message.chat.id, f'Getting Things Done, GTD - методика планирования, которая\n'
+                                            f'подразумевает постановку главной задачи, для достижения которой надо\n'
+                                            f'поставить более мелкие подзадачи, которые в случае надобности тоже могут\n'
+                                            f'разбиваться на подзадачи.',
+                           parse_mode='html', reply_markup=buttons(learning_men))
+
+    if message.text == learning_men[0]:
+        msg = bot.send_message(message.chat.id, f'https://singularity-app.ru/blog/gtd-in-singularityapp/\n'
+                                                f'подробная статья о системе Getting Things Done',
+                               parse_mode='html', reply_markup=buttons(learning_men))
+    elif message.text == learning_men[1]:
+        msg = bot.send_photo(message.chat.id, f'blob:https://web.telegram.org/334b97ae-cb14-4596-bf5e-f48093e396ec',
+                               parse_mode='html', reply_markup=buttons(learning_men))
+
+    elif message.text == learning_men[2]:
+        msg = bot.send_message(message.chat.id, f'https://my.mail.ru/mail/qwerve/video/8/393.html\n'
+                                                f'подробное видео о системе Getting Things Done',
+                               parse_mode='html', reply_markup=buttons(learning_men))
+
+    elif message.text == learning_men[3]:
+        bot.register_next_step_handler(msg, study_kanban)
+
+
+def study_kanban(message):
+    msg = bot.send_message(message.chat.id, f'Канбан — это методика управления проектами, которая\n'
+                                            f'представляет собой доску с разметкой — шагами проекта.\n'
+                                            f'На неё крепят карточки-задачи и перемещают их из этапа в этап\n'
+                                            f'по ходу работы.',
+                           parse_mode='html', reply_markup=buttons(learning_men))
+
+    if message.text == learning_men[0]:
+        msg = bot.send_message(message.chat.id, f'https://singularity-app.ru/blog/personalnyi-kanban/\n'
+                                                f'подробная статья о системе Канбан',
+                               parse_mode='html', reply_markup=buttons(learning_men))
+    elif message.text == learning_men[1]:
+        msg = bot.send_photo(message.chat.id, f'https://avatars.dzeninfra.ru/get-zen_doc/1889358/pub_5fe21190785777679a4b8ea3_5fe23f12f7cdfe2e8961981d/scale_1200',
+                             parse_mode='html', reply_markup=buttons(learning_men))
+
+    elif message.text == learning_men[2]:
+        msg = bot.send_message(message.chat.id, f'https://youtu.be/M1-IcgdDJb0\n'
+                                                f'подробное видео о системе Канбан',
+                               parse_mode='html', reply_markup=buttons(learning_men))
+
+    elif message.text == learning_men[3]:
+        bot.register_next_step_handler(msg, study_matrix)
+
+def study_matrix(message):
+    msg = bot.send_message(message.chat.id, f'Матрица Эйзенхауэра - это система, которая строится на том,\n'
+                                            f'что все дела делятся на 4 квадрата по параметрам срочности и важности.\n'
+                                            f'То есть формируются 4 списка дел:\n'
+                                            f'• важные несрочные\n'
+                                            f'• важные срочные\n'
+                                            f'• неважные срочные\n'
+                                            f'• неважные несрочные\n',
+                           parse_mode='html', reply_markup=buttons(learning_men))
+
+    if message.text == learning_men[0]:
+        msg = bot.send_message(message.chat.id, f'https://trends.rbc.ru/trends/education/60a519599a7947430a73ff6b\n'
+                                                f'подробная статья о Матрице Эйзенхауэра',
+                               parse_mode='html', reply_markup=buttons(learning_men))
+    elif message.text == learning_men[1]:
+        msg = bot.send_photo(message.chat.id,
+                             f'https://3этаж.рф/800/600/http/new-world-rpg.ru/wp-content/uploads/4/5/b/45b10e439cb9e46701341bf3002f4b1d.jpeg',
+                             parse_mode='html', reply_markup=buttons(learning_men))
+
+    elif message.text == learning_men[2]:
+        msg = bot.send_message(message.chat.id, f'https://youtu.be/RmN3dDrJ1l4\n'
+                                                f'подробное видео о Матрице Эйзенхауэра',
+                               parse_mode='html', reply_markup=buttons(learning_men))
+
+    elif message.text == learning_men[3]:
+        bot.register_next_step_handler(msg, study_pomodoro)
+
+
+def study_pomodoro(message):
+    msg = bot.send_message(message.chat.id, f'Система Помодоро направлена на максимальную концентрацию\n'
+                                            f'в определённый промежуток времени. Вы чередуете периоды интенсивной\n'
+                                            f'работы с периодами отдыха за счёт чего не "перегораете".\n'
+                                            f'Классически система настроена на 25 минут работы и 5 минут отдыха,\n'
+                                            f'и увеличенный интервал отдыха после нескольких циклов.\n',
+                           parse_mode='html', reply_markup=buttons(learning_men))
+
+    if message.text == learning_men[0]:
+        msg = bot.send_message(message.chat.id, f'https://trends.rbc.ru/trends/education/5f55e4ad9a79472e20842053\n'
+                                                f'подробная статья о таймере Помодоро',
+                               parse_mode='html', reply_markup=buttons(learning_men))
+
+    elif message.text == learning_men[1]:
+        msg = bot.send_photo(message.chat.id,
+                             f'blob:https://web.telegram.org/9d6d3991-6358-407d-bb9c-a59cf41f7fa7',
+                             parse_mode='html', reply_markup=buttons(learning_men))
+
+    elif message.text == learning_men[2]:
+        msg = bot.send_message(message.chat.id, f'https://youtu.be/HfjcAiDrU6U\n'
+                                                f'подробное видео о таймере Помодоро',
+                               parse_mode='html', reply_markup=buttons(learning_men))
+
+    elif message.text == learning_men[3]:
+        bot.register_next_step_handler(msg, study_menu)
 
 
 def study_gpt(message):
