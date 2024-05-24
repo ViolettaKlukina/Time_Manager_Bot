@@ -119,6 +119,8 @@ def gtd_plans(message):
     gtd_messages = select_gtd(user_id)
     s, m = gtd_messages
     bot.send_message(user_id, f'Задачи на месяц: {s}\nЗадачи на неделю: {m}')
+        if s == '' and m == '':
+        bot.send_message(user_id, 'У вас пока что нет планов.')
     
 
 #POMODORO
@@ -210,6 +212,8 @@ def kanban_plans(message):
     s, m, g = matrix_messages
     bot.send_message(user_id,
                      f'Что сделано:\n{s}\nЧто делается:\n{m}\nЧто надо сделать:\n{g}')
+    if s == '' and m == '' and g == '':
+        bot.send_message(user_id, 'У вас пока что нет планов.')
 
 
 # МАТРИЦА ЭЙЗЕНХАУЭРА
@@ -283,6 +287,8 @@ def matrix_plans(message):
     matrix_messages = select_matrix(user_id)
     s, m, g, h = matrix_messages
     bot.send_message(user_id, f'Важное срочное:\n{s}\nВажное несрочное:\n{m}\nНеважное срочное:\n{g}\nНеважное несрочное: {h}')
+    if s == '' and m == '' and g == '' and h == '':
+        bot.send_message(user_id, 'У вас пока что нет планов.')
 
 # обучение
 def study_menu(message):
