@@ -2,8 +2,8 @@ MAX_USERS = 10
 BOT_TOKEN = "6926752608:AAGyQmnRzYEF6eaNUGDA3SxOrSJ09DvRHxg"
 
 MAX_TOKENS = 1000
-TOKEN_PATH = "\creds\gpt_token.json"
-FOLDER_ID_PATH = '\creds\gpt_folder_id.txt'
+TOKEN_PATH = "creds/gpt_token.json"
+FOLDER_ID_PATH = 'creds/gpt_folder_id.txt'
 
 LOGS = '1.txt'
 DB_FILE = 'dbtest.db'

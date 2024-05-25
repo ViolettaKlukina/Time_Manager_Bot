@@ -2,7 +2,7 @@ import telebot
 from telebot import types
 from config import *
 import time
-from datetime import  *
+from datetime import *
 from db import *
 from yandex_gpt import *
 from speechkit import *
@@ -227,21 +227,48 @@ def kanban_go(message):
 
 
 def kanban_insert_done(message):
-    update_row_value_kanban(message.chat.id, 'done', message.text)
+    if message.voice:
+        ans = stt(message.voice)
+        if ans[0]:
+            update_row_value_kanban(message.chat.id, 'done', ans[1])
+        else:
+            msg = bot.send_message(message.chat.id, ans[1],
+                                   parse_mode='html', reply_markup=buttons(kanban_men))
+            bot.register_next_step_handler(msg, kanban_go)
+    else:
+        update_row_value_kanban(message.chat.id, 'done', message.text)
     msg = bot.send_message(message.chat.id, f'<i>Введи что сделано, что делается и что надо сделать:</i>',
                            parse_mode='html', reply_markup=buttons(kanban_men))
     bot.register_next_step_handler(msg, kanban_go)
 
 
 def kanban_insert_doing(message):
-    update_row_value_kanban(message.chat.id, 'doing', message.text)
+    if message.voice:
+        ans = stt(message.voice)
+        if ans[0]:
+            update_row_value_kanban(message.chat.id, 'doing', ans[1])
+        else:
+            msg = bot.send_message(message.chat.id, ans[1],
+                                   parse_mode='html', reply_markup=buttons(kanban_men))
+            bot.register_next_step_handler(msg, kanban_go)
+    else:
+        update_row_value_kanban(message.chat.id, 'doing', message.text)
     msg = bot.send_message(message.chat.id, f'<i>Введи что сделано, что делается и что надо сделать:</i>',
                            parse_mode='html', reply_markup=buttons(kanban_men))
     bot.register_next_step_handler(msg, kanban_go)
 
 
 def kanban_insert_will_do(message):
-    update_row_value_kanban(message.chat.id, 'will do', message.text)
+    if message.voice:
+        ans = stt(message.voice)
+        if ans[0]:
+            update_row_value_kanban(message.chat.id, 'will do', ans[1])
+        else:
+            msg = bot.send_message(message.chat.id, ans[1],
+                                   parse_mode='html', reply_markup=buttons(kanban_men))
+            bot.register_next_step_handler(msg, kanban_go)
+    else:
+        update_row_value_kanban(message.chat.id, 'will do', message.text)
     msg = bot.send_message(message.chat.id, f'<i>Введи что сделано, что делается и что надо сделать:</i>',
                            parse_mode='html', reply_markup=buttons(kanban_men))
     bot.register_next_step_handler(msg, kanban_go)
@@ -292,7 +319,16 @@ def matrix_go(message):
 
 
 def matrix_insert_imp_urg(message):
-    update_row_value_matrix(message.chat.id, 'imp_urg', message.text)
+    if message.voice:
+        ans = stt(message.voice)
+        if ans[0]:
+            update_row_value_kanban(message.chat.id, 'imp_urg', ans[1])
+        else:
+            msg = bot.send_message(message.chat.id, ans[1],
+                                   parse_mode='html', reply_markup=buttons(matrix_men))
+            bot.register_next_step_handler(msg, kanban_go)
+    else:
+        update_row_value_matrix(message.chat.id, 'imp_urg', message.text)
     msg = bot.send_message(message.chat.id, f'Введите задачи: важные срочные, важные несрочные, неважные срочные, неважные несрочные.',
                            parse_mode='html', reply_markup=buttons(matrix_men))
     bot.register_next_step_handler(msg, matrix_go)
@@ -472,3 +508,4 @@ def reminder_check():
         bot.send_message(i[0], i[2])
 
 
+bot.polling()
