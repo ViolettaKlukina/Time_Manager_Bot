@@ -258,7 +258,7 @@ def update_row_value_kanban(user_id:int, column_name:str, new_value:str):
     '''возвращает bool'''
     try:
         if is_value_in_table('kanban', 'user_id', user_id)[0] is True:
-            sql_query = f'UPDATE kanban1 SET {column_name} = "{new_value}" WHERE user_id = {user_id};'
+            sql_query = f'UPDATE kanban SET {column_name} = "{new_value}" WHERE user_id = {user_id};'
             execute_query(sql_query)
             return True
         else:
