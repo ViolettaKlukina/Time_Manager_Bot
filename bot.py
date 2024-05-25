@@ -2,8 +2,10 @@ import telebot
 from telebot import types
 from config import *
 import time
+from datetime import  *
 from db import *
 from yandex_gpt import *
+from speechkit import *
 
 # подготовка
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -72,7 +74,37 @@ def change_plan(message):
                                parse_mode='html', reply_markup=buttons(Systems_plan))
         bot.register_next_step_handler(msg, change_plan)
 
+# Напоминалки
+def reminder_menu(message):
+    msg = bot.send_message(message.chat.id, 'Напишите текст или аудио для напоминалки',
+                           parse_mode='html', reply_markup=buttons(reminder_men))
+    bot.register_next_step_handler(msg, change_plan)
 
+def reminder_go(message):
+    if message.text == reminder_men[0]:
+        menu(message)
+    else:
+        if message.voice:
+            ans = stt(message.voice)
+            if ans[0]:
+                msg = bot.send_message(message.chat.id, 'напишите время отпраки в формате:\n'
+                                                        'день-месяц-год часы:минуты(по МСК(+3))'
+                                                        'пример: 25-05-2024 15:30')
+                bot.register_next_step_handler(msg, reminder_time, ans[1])
+            else:
+                msg = bot.send_message(message.chat.id, ans[1])
+                bot.register_next_step_handler(msg, reminder_menu)
+        else:
+            msg = bot.send_message(message.chat.id, 'напишите время отпраки в формате:\n'
+                                                    'день-месяц-год часы:минуты(по МСК(+3))'
+                                                    'пример: 25-05-2024 15:30')
+            bot.register_next_step_handler(msg, reminder_time, message.text)
+
+
+def reminder_time(message, text):
+    insert_reminder(message.chat.id, message.text, text)
+    bot.send_message(message.chat.id, 'Напоминание сохранено)')
+    menu(message)
 # GTD
 def GTD_menu(message):
     msg = bot.send_message(message.chat.id, f'<i>Поставь задачи на месяц или на неделю:</i>',
@@ -119,7 +151,7 @@ def gtd_plans(message):
     gtd_messages = select_gtd(user_id)
     s, m = gtd_messages
     bot.send_message(user_id, f'Задачи на месяц: {s}\nЗадачи на неделю: {m}')
-        if s == '' and m == '':
+    if s == '' and m == '':
         bot.send_message(user_id, 'У вас пока что нет планов.')
     
 
@@ -138,7 +170,8 @@ def pomodoro_go(message):
         msg = bot.send_message(message.chat.id, f'<i>напишите числа через пробел и начнётся таймер:'
                                                 f'кол-во минут работы'
                                                 f'кол-во минут отдыха в первый цикл'
-                                                f'кол-во циклов</i>',
+                                                f'кол-во циклов'
+                                                f'Пример: 25 5 3</i>',
                                parse_mode='html', reply_markup=markup_no)
         bot.register_next_step_handler(msg, pomodoro_settings)
 
@@ -148,13 +181,20 @@ def pomodoro_settings(message):
 
 
 def timer_pomidoro(message, job=25, rest=5, count=3):
-    for i in range(count):
-        bot.send_message(message.chat.id, f'<i>Пора работать</i>', parse_mode='html')
-        time.sleep(60 * job)
-        if i != count - 1:
-            bot.send_message(message.chat.id, f'<i>пора отдохнуть</i>', parse_mode='html')
-            time.sleep(60 * (rest + i * 3))
-    menu(message)
+    offset = timedelta(hours=0)
+    tz = timezone(offset, name='МСК')
+    bot.send_message(message.chat.id, 'Пора работать')
+    time = datetime.now(tz=tz)
+    for _ in range(count):
+        time += timedelta(minutes=job)
+        time_str = time.strftime("%d-%m-%Y %H:%M")
+        insert_reminder(message.chat.id, time_str, "Пора отдохнуть")
+        time += timedelta(minutes=rest)
+        time_str = time.strftime("%d-%m-%Y %H:%M")
+        insert_reminder(message.chat.id, time_str, "Пора работать")
+
+
+
 
 #Канбан
 def kanban_menu(message): #
@@ -422,38 +462,13 @@ def study_gpt(message):
     bot.register_next_step_handler(msg, study_go)
 
 
-@bot.message_handler(content_types=['voice'])
-def voice_handler(message):
-    user_id = message.from_user.id
-    file_id = message.voice.file_id
-    file_info = bot.get_file(file_id)
-    file = bot.download_file(file_info.file_path)
-    stt_status, stt_text = stt(file)
-    if not stt_status:
-        """ если что-то не так, уведомляем пользователя """
-        bot.send_message(user_id, stt_text)
-        return
-    """ нужна функция в бд для добавления текста """
-    stt_blocks, error_message = count_all_limits(user_id, 'stt_blocks')
-    if not stt_blocks:
-        bot.send_message(user_id, error_message)
-        return
-    add_message(user_id=user_id, message=[stt_text, 'user', 0, 0, stt_blocks])
+def reminder_check():
+    offset = timedelta(hours=0)
+    tz = timezone(offset, name='МСК')
+    time = datetime.now(tz=tz)
+    time_str = time.strftime("%d-%m-%Y %H:%M")
+    msg_task = its_time(time_str)
+    for i in msg_task:
+        bot.send_message(i[0], i[2])
 
 
-@bot.message_handler(content_types=['voice'], text=['Вопрос к gpt'])
-def ask_gpt_with_voice(message):
-    user_id = message.from_user.id
-    last_message, spent_tokens = select_n_last_messages(user_id, 1)
-    total_gpt_tokens, error_message = count_all_limits(last_message, 'gpt_tokens')
-    if error_message:
-        bot.send_message(user_id, error_message)
-        return
-    status_gpt, answer_gpt, tokens_in_answer = ask_gpt(last_message)
-    if not status_gpt:
-        bot.send_message(user_id, answer_gpt)
-    tts_symbols, error_message = count_all_limits(message, 'tts_symbols')
-    add_message(user_id=user_id, message=[answer_gpt, 'assistant', total_gpt_tokens, tts_symbols, 0])
-    if error_message:
-        bot.send_message(user_id, error_message)
-    bot.send_message(user_id, answer_gpt, reply_to_message_id=message.id)

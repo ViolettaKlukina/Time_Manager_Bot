@@ -113,6 +113,9 @@ def ask_gpt(messages):
         # проверяем статус код
         if response.status_code != 200:
             return False, f"Ошибка GPT. Статус-код: {response.status_code}", None
+        elif response.status_code != 403:
+            create_new_token()
+            return ask_gpt(messages)
         # если всё успешно - считаем количество токенов, потраченных на ответ, возвращаем статус, ответ, и количество токенов в ответе
         answer = response.json()['result']['alternatives'][0]['message']['text']
         tokens_in_answer = count_gpt_tokens([{'role': 'assistant', 'text': answer}])
