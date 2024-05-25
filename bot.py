@@ -421,3 +421,39 @@ def study_gpt(message):
     msg = bot.send_message(message.chat.id, ans, reply_markup=buttons(study_men))
     bot.register_next_step_handler(msg, study_go)
 
+
+@bot.message_handler(content_types=['voice'])
+def voice_handler(message):
+    user_id = message.from_user.id
+    file_id = message.voice.file_id
+    file_info = bot.get_file(file_id)
+    file = bot.download_file(file_info.file_path)
+    stt_status, stt_text = stt(file)
+    if not stt_status:
+        """ если что-то не так, уведомляем пользователя """
+        bot.send_message(user_id, stt_text)
+        return
+    """ нужна функция в бд для добавления текста """
+    stt_blocks, error_message = count_all_limits(user_id, 'stt_blocks')
+    if not stt_blocks:
+        bot.send_message(user_id, error_message)
+        return
+    add_message(user_id=user_id, message=[stt_text, 'user', 0, 0, stt_blocks])
+
+
+@bot.message_handler(content_types=['voice'], text=['Вопрос к gpt'])
+def ask_gpt_with_voice(message):
+    user_id = message.from_user.id
+    last_message, spent_tokens = select_n_last_messages(user_id, 1)
+    total_gpt_tokens, error_message = count_all_limits(last_message, 'gpt_tokens')
+    if error_message:
+        bot.send_message(user_id, error_message)
+        return
+    status_gpt, answer_gpt, tokens_in_answer = ask_gpt(last_message)
+    if not status_gpt:
+        bot.send_message(user_id, answer_gpt)
+    tts_symbols, error_message = count_all_limits(message, 'tts_symbols')
+    add_message(user_id=user_id, message=[answer_gpt, 'assistant', total_gpt_tokens, tts_symbols, 0])
+    if error_message:
+        bot.send_message(user_id, error_message)
+    bot.send_message(user_id, answer_gpt, reply_to_message_id=message.id)
