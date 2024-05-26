@@ -582,11 +582,16 @@ def study_pomodoro(message):
         msg = bot.send_message(message.chat.id, 'Напишите любой текст, чтобы продолжить',
                            parse_mode='html', reply_markup=markup_no)
         bot.register_next_step_handler(msg, study_menu)
+        
+
+@bot.message_handler(commands=['ask_gpt'])
+def gpt_asking(message):
+    msg = bot.send_message(message.chat.id, 'Напишите ваш вопрос')
+    bot.register_next_step_handler(msg, asking)
 
 
-def study_gpt(message):
-    fil, ans, count = ask_gpt(message.text)
-    msg = bot.send_message(message.chat.id, ans, reply_markup=buttons(study_men))
-    bot.register_next_step_handler(msg, study_go)
+def asking(message):
+    status, ans, toks = ask_gpt(message)
+    bot.send_message(message.chat.id, ans)
 
 bot.polling()
