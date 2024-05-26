@@ -1,8 +1,31 @@
-2024-05-25 23:36:02,208 FILE: db.py IN: create_database MESSAGE: DATABASE: The database MESSAGES exists
-2024-05-25 23:36:02,209 FILE: db.py IN: create_db_gtd MESSAGE: DATABASE: The database GTD exists
-2024-05-25 23:36:02,210 FILE: db.py IN: create_db_kanban MESSAGE: DATABASE: The database KANBAN exists
-2024-05-25 23:36:02,210 FILE: db.py IN: create_db_matrix MESSAGE: DATABASE: The database MATRIX exists
-2024-05-25 23:36:02,211 FILE: db.py IN: create_db_reminder MESSAGE: DATABASE: The database REMINDER exists
-2024-05-25 23:36:02,217 FILE: connectionpool.py IN: _new_conn MESSAGE: Starting new HTTPS connection (1): api.telegram.org:443
-2024-05-25 23:36:02,416 FILE: connectionpool.py IN: _make_request MESSAGE: https://api.telegram.org:443 "GET /bot6926752608:AAGyQmnRzYEF6eaNUGDA3SxOrSJ09DvRHxg/getMe HTTP/1.1" 200 239
-2024-05-25 23:36:02,420 FILE: connectionpool.py IN: _new_conn MESSAGE: Starting new HTTPS connection (1): api.telegram.org:443
+2024-05-26 08:35:14,073 FILE: db.py IN: create_database MESSAGE: DATABASE: The database MESSAGES exists
+2024-05-26 08:35:14,073 FILE: db.py IN: create_db_gtd MESSAGE: DATABASE: The database GTD exists
+2024-05-26 08:35:14,074 FILE: db.py IN: create_db_kanban MESSAGE: DATABASE: The database KANBAN exists
+2024-05-26 08:35:14,075 FILE: db.py IN: create_db_matrix MESSAGE: DATABASE: The database MATRIX exists
+2024-05-26 08:35:14,076 FILE: db.py IN: create_db_reminder MESSAGE: DATABASE: The database REMINDER exists
+2024-05-26 08:35:18,131 FILE: connectionpool.py IN: _new_conn MESSAGE: Starting new HTTPS connection (1): api.telegram.org:443
+2024-05-26 08:35:18,303 FILE: connectionpool.py IN: _make_request MESSAGE: https://api.telegram.org:443 "GET /bot6926752608:AAGyQmnRzYEF6eaNUGDA3SxOrSJ09DvRHxg/getMe HTTP/1.1" 200 239
+2024-05-26 08:35:18,306 FILE: connectionpool.py IN: _new_conn MESSAGE: Starting new HTTPS connection (1): api.telegram.org:443
+2024-05-26 08:35:22,095 FILE: connectionpool.py IN: _make_request MESSAGE: https://api.telegram.org:443 "GET /bot6926752608:AAGyQmnRzYEF6eaNUGDA3SxOrSJ09DvRHxg/getUpdates?offset=1&timeout=20 HTTP/1.1" 409 143
+2024-05-26 08:35:22,100 FILE: __init__.py IN: __threaded_polling MESSAGE: Threaded polling exception: A request to the Telegram API was unsuccessful. Error code: 409. Description: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2024-05-26 08:35:22,101 FILE: __init__.py IN: __threaded_polling MESSAGE: Exception traceback:
+Traceback (most recent call last):
+  File "D:\яндекс\яндекс практикум\venv\lib\site-packages\telebot\__init__.py", line 1081, in __threaded_polling
+    polling_thread.raise_exceptions()
+  File "D:\яндекс\яндекс практикум\venv\lib\site-packages\telebot\util.py", line 108, in raise_exceptions
+    raise self.exception_info
+  File "D:\яндекс\яндекс практикум\venv\lib\site-packages\telebot\util.py", line 90, in run
+    task(*args, **kwargs)
+  File "D:\яндекс\яндекс практикум\venv\lib\site-packages\telebot\__init__.py", line 651, in __retrieve_updates
+    updates = self.get_updates(offset=(self.last_update_id + 1),
+  File "D:\яндекс\яндекс практикум\venv\lib\site-packages\telebot\__init__.py", line 625, in get_updates
+    json_updates = apihelper.get_updates(self.token, offset, limit, timeout, allowed_updates, long_polling_timeout)
+  File "D:\яндекс\яндекс практикум\venv\lib\site-packages\telebot\apihelper.py", line 323, in get_updates
+    return _make_request(token, method_url, params=payload)
+  File "D:\яндекс\яндекс практикум\venv\lib\site-packages\telebot\apihelper.py", line 164, in _make_request
+    json_result = _check_result(method_name, result)
+  File "D:\яндекс\яндекс практикум\venv\lib\site-packages\telebot\apihelper.py", line 191, in _check_result
+    raise ApiTelegramException(method_name, result, result_json)
+telebot.apihelper.ApiTelegramException: A request to the Telegram API was unsuccessful. Error code: 409. Description: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+
+2024-05-26 08:35:18,089 FILE: db.py IN: execute_selection_query MESSAGE: DATABASE: Execute query: SELECT user_id, send_time, text_mes FROM reminder;
