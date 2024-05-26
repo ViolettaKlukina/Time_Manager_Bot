@@ -185,8 +185,8 @@ def create_db_gtd():
                 CREATE TABLE IF NOT EXISTS gtd (
                 id INTEGER PRIMARY KEY,
                 user_id INTEGER,
-                main_task TEXT,
-                task TEXT);
+                week_task TEXT,
+                month_task TEXT);
             ''')
             logging.info("DATABASE: The database GTD exists")  # делаем запись в логах
     except Exception as e:
@@ -194,9 +194,9 @@ def create_db_gtd():
         return None
 
 
-def insert_gtd(user_id:int, main_task:str, task:str):
-    values = (user_id, main_task, task)
-    columns = '(user_id, main_task, task)'
+def insert_gtd(user_id:int, week_task:str, month_task:str):
+    values = (user_id, week_task, month_task)
+    columns = '(user_id, week_task, month_task)'
     sql_query = f"INSERT INTO gtd {columns} VALUES (?, ?, ?);"
     execute_query(sql_query, values)
 
@@ -219,7 +219,7 @@ def update_row_value_gtd(user_id:int, column_name:str, new_value:str):
 def select_gtd(user_id:int):
     '''возвращает список кортеей, где нулевой элемент - задача, а первый - подзадача к ней или сообщение'''
     if is_value_in_table('gtd', 'user_id', user_id)[0] is True:
-        columns = 'main_task, task'
+        columns = 'week_task, month_task'
         rows = execute_selection_query(f"SELECT {columns} FROM gtd WHERE user_id = {user_id};")
         print(rows)
         return rows
@@ -248,7 +248,6 @@ def create_db_kanban():
 
 
 def insert_kanban(user_id:int, done:str, doing:str, will_do:str):
-    clean_user(user_id, 'kanban')
     values = (user_id, done, doing, will_do) 
     columns = '(user_id, done, doing, will_do)'
     sql_query = f"INSERT INTO kanban {columns} VALUES (?, ?, ?, ?);"
@@ -279,7 +278,7 @@ def select_kanban(user_id:int):
     else:
         msg = 'Пока у Вас нет внесённых задач'
         print(msg)
-        return '', '', ''
+        return msg
     
 
 #MATRIX
@@ -304,7 +303,6 @@ def create_db_matrix():
 
 def insert_matrix(user_id:int, imp_urg:str, imp_nonur:str, unimp_urg:str, unimp_nonurg:str):
     '''важное срочное, важное несрочное, неважное срочное, неважное несрочное'''
-    clean_user(user_id, 'matrix')
     values = (user_id, imp_urg, imp_nonur, unimp_urg, unimp_nonurg)
     columns = '(user_id, imp_urg, imp_nonur, unimp_urg, unimp_nonurg)'
     sql_query = f"INSERT INTO matrix {columns} VALUES (?, ?, ?, ?, ?);"
@@ -337,7 +335,7 @@ def select_matrix(user_id:int):
     else:
         msg = 'Пока у Вас нет внесённых задач'
         print(msg)
-        return '', '', '', ''
+        return msg
 
 
 #REMINDER + POMODORO
@@ -389,13 +387,15 @@ def its_time(now_time:str):
     now_need = []
     for value in values:
         if now_time == value[1]:
-            now_need.append(value)
+            now_need += value
+    # for val in now_need:
+    #     clean_record(user_id:int, table_name:str, column_name:str, column_value)
     print(now_need)
     return now_need
 
 
 #speechkit & gpt
-def create_database():
+def create_speech_gpt():
     try:
         with sqlite3.connect(path_to_db) as conn:
             cursor = conn.cursor()
@@ -435,7 +435,7 @@ def count_users(user_id:int):
     try:
         with sqlite3.connect(path_to_db) as conn:
             cursor = conn.cursor()
-            cursor.execute('''SELECT COUNT(DISTINCT user_id) FROM messages WHERE user_id <> ?''', (user_id,))
+            cursor.execute(f'''SELECT COUNT DISTINCT user_id FROM messages WHERE user_id <> {user_id};''')
             count = cursor.fetchone()[0]
             return count 
     except Exception as e:
@@ -467,7 +467,7 @@ def count_all_limits(user_id:int, limit_type:str):
     try:
         with sqlite3.connect(path_to_db) as conn:
             cursor = conn.cursor()
-            cursor.execute(f'''SELECT SUM({limit_type}) FROM messages WHERE user_id=?''', (user_id,))
+            cursor.execute(f'SELECT SUM({limit_type}) FROM messages WHERE user_id={user_id};')
             data = cursor.fetchone()
             if data and data[0]:
                 logging.info(f"DATABASE: У user_id={user_id} использовано {data[0]} {limit_type}")
