@@ -135,7 +135,7 @@ def reminder_time(message, text):
 def GTD_menu(message):
     msg = bot.send_message(message.chat.id, f'<i>Поставь задачи на месяц или на неделю:</i>',
                            parse_mode='html', reply_markup=buttons(GTD_men))
-    insert_gtd([message.chat.id, '', ''])
+    insert_gtd(message.chat.id, '', '')
     bot.register_next_step_handler(msg, GTD_go)
 
 
@@ -437,7 +437,7 @@ def study_go(message):
         menu(message)
 
 def study(message):
-    msg = bot.send_message(message.chat.id, f'Поздравляем! Вы начали мини-обучение по системам планирования.',
+    msg = bot.send_message(message.chat.id, f'Поздравляем! Вы начали мини-обучение по системам планирования. (Напишите любой текст, чтоб продолжить)',
                            parse_mode='html', reply_markup=markup_no)
     bot.register_next_step_handler(msg, study_GTD)
 
@@ -553,6 +553,5 @@ def study_gpt(message):
     fil, ans, count = ask_gpt(message.text)
     msg = bot.send_message(message.chat.id, ans, reply_markup=buttons(study_men))
     bot.register_next_step_handler(msg, study_go)
-
 
 bot.polling()
