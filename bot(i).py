@@ -127,7 +127,7 @@ def varies_handler(message):
     if message.text == varies[0]:
         bot.register_next_step_handler(message, GTD_go)
     elif message.text == varies[1]:
-        bot.register_next_step_handler(message, GTD_go)
+        bot.register_next_step_handler(message, change_plan)
 
 
 def gtd_plans(message):
