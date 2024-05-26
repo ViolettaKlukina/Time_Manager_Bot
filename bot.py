@@ -23,11 +23,11 @@ def reminder_check():
     while True:
         time = datetime.now(tz=tz)
         time_str = time.strftime("%d-%m-%Y %H:%M")
-        print(time_str)
         msg_task = its_time(time_str)
         for i in msg_task:
             bot.send_message(i[0], i[2])
             print('отправлено')
+        sleep(60)
 
 if __name__ == '__main__':
     p = Process(target=reminder_check)
@@ -193,10 +193,10 @@ def pomodoro_go(message):
     elif message.text == pomodoro_buttons[1]:
         menu_go(message)
     elif message.text == pomodoro_buttons[2]:
-        msg = bot.send_message(message.chat.id, f'<i>напишите числа через пробел и начнётся таймер:'
-                                                f'кол-во минут работы'
-                                                f'кол-во минут отдыха в первый цикл'
-                                                f'кол-во циклов'
+        msg = bot.send_message(message.chat.id, f'<i>напишите числа через пробел и начнётся таймер:\n'
+                                                f'кол-во минут работы\n'
+                                                f'кол-во минут отдыха в первый цикл\n'
+                                                f'кол-во циклов\n'
                                                 f'Пример: 25 5 3</i>',
                                parse_mode='html', reply_markup=markup_no)
         bot.register_next_step_handler(msg, pomodoro_settings)
@@ -218,6 +218,7 @@ def timer_pomidoro(message, job=25, rest=5, count=3):
         time += timedelta(minutes=rest)
         time_str = time.strftime("%d-%m-%Y %H:%M")
         insert_reminder(message.chat.id, time_str, "Пора работать")
+    menu(message)
 
 
 
@@ -447,6 +448,8 @@ def study_GTD(message):
                                             f'поставить более мелкие подзадачи, которые в случае надобности тоже могут\n'
                                             f'разбиваться на подзадачи.',
                            parse_mode='html', reply_markup=buttons(learning_men))
+    bot.register_next_step_handler(msg, study_GTD)
+
 
     if message.text == learning_men[0]:
         msg = bot.send_message(message.chat.id, f'https://singularity-app.ru/blog/gtd-in-singularityapp/\n'
@@ -471,6 +474,7 @@ def study_kanban(message):
                                             f'На неё крепят карточки-задачи и перемещают их из этапа в этап\n'
                                             f'по ходу работы.',
                            parse_mode='html', reply_markup=buttons(learning_men))
+    bot.register_next_step_handler(msg, study_kanban)
 
     if message.text == learning_men[0]:
         msg = bot.send_message(message.chat.id, f'https://singularity-app.ru/blog/personalnyi-kanban/\n'
@@ -497,6 +501,7 @@ def study_matrix(message):
                                             f'• неважные срочные\n'
                                             f'• неважные несрочные\n',
                            parse_mode='html', reply_markup=buttons(learning_men))
+    bot.register_next_step_handler(msg, study_matrix)
 
     if message.text == learning_men[0]:
         msg = bot.send_message(message.chat.id, f'https://trends.rbc.ru/trends/education/60a519599a7947430a73ff6b\n'
@@ -523,6 +528,7 @@ def study_pomodoro(message):
                                             f'Классически система настроена на 25 минут работы и 5 минут отдыха,\n'
                                             f'и увеличенный интервал отдыха после нескольких циклов.\n',
                            parse_mode='html', reply_markup=buttons(learning_men))
+    bot.register_next_step_handler(msg, study_pomodoro)
 
     if message.text == learning_men[0]:
         msg = bot.send_message(message.chat.id, f'https://trends.rbc.ru/trends/education/5f55e4ad9a79472e20842053\n'
@@ -544,14 +550,9 @@ def study_pomodoro(message):
 
 
 def study_gpt(message):
-    fil, ans, count = ask_gpt(message)
+    fil, ans, count = ask_gpt(message.text)
     msg = bot.send_message(message.chat.id, ans, reply_markup=buttons(study_men))
     bot.register_next_step_handler(msg, study_go)
-
-
-
-
-
 
 
 bot.polling()
