@@ -535,11 +535,14 @@ def study_gpt(message):
 def reminder_check():
     offset = timedelta(hours=3)
     tz = timezone(offset, name='МСК')
-    time = datetime.now(tz=tz)
-    time_str = time.strftime("%d-%m-%Y %H:%M")
-    msg_task = its_time(time_str)
-    for i in msg_task:
-        bot.send_message(i[0], i[2])
+    while True:
+        time = datetime.now(tz=tz)
+        time_str = time.strftime("%d-%m-%Y %H:%M")
+        print(time_str)
+        msg_task = its_time(time_str)
+        for i in msg_task:
+            bot.send_message(i[0], i[2])
+            print('отправлено')
 
 if __name__ == '__main__':
     p = Process(target=reminder_check)
