@@ -248,6 +248,7 @@ def create_db_kanban():
 
 
 def insert_kanban(user_id:int, done:str, doing:str, will_do:str):
+    clean_user(user_id, 'kanban')
     values = (user_id, done, doing, will_do) 
     columns = '(user_id, done, doing, will_do)'
     sql_query = f"INSERT INTO kanban {columns} VALUES (?, ?, ?, ?);"
@@ -278,7 +279,7 @@ def select_kanban(user_id:int):
     else:
         msg = 'Пока у Вас нет внесённых задач'
         print(msg)
-        return msg
+        return '', '', ''
     
 
 #MATRIX
@@ -303,6 +304,7 @@ def create_db_matrix():
 
 def insert_matrix(user_id:int, imp_urg:str, imp_nonur:str, unimp_urg:str, unimp_nonurg:str):
     '''важное срочное, важное несрочное, неважное срочное, неважное несрочное'''
+    clean_user(user_id, 'matrix')
     values = (user_id, imp_urg, imp_nonur, unimp_urg, unimp_nonurg)
     columns = '(user_id, imp_urg, imp_nonur, unimp_urg, unimp_nonurg)'
     sql_query = f"INSERT INTO matrix {columns} VALUES (?, ?, ?, ?, ?);"
