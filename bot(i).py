@@ -84,7 +84,6 @@ def change_plan(message):
 def GTD_menu(message):
     msg = bot.send_message(message.chat.id, f'<i>Выбери, что хочешь сделать (можешь переключаться между вариантами с помощью клавиатуры):</i>',
                            parse_mode='html', reply_markup=buttons(GTD_men))
-    insert_gtd(message.chat.id, '', '')
     bot.register_next_step_handler(msg, GTD_go)
 
 
@@ -108,7 +107,7 @@ def GTD_go(message):
 
 
 def insert_gtd_month_task(message):
-    update_row_value_gtd(message.chat.id, 'main_task', message.text)
+    insert_gtd(message.chat.id, 'month_task', message.text)
     msg = bot.send_message(message.chat.id, f'<i>Чтобы ввести ещё одну задачу, нажми на "ещё".\n'
                            'Кнопка "назад" вернёт тебя в меню системы GTD </i>',
                            parse_mode='html', reply_markup=buttons(varies))
@@ -116,7 +115,7 @@ def insert_gtd_month_task(message):
 
 
 def insert_gtd_week_task(message):
-    update_row_value_gtd(message.chat.id, 'task', message.text)
+    insert_gtd(message.chat.id, 'week_task', message.text)
     msg = bot.send_message(message.chat.id, f'<i>Чтобы ввести ещё одну задачу, нажми на "ещё".\n'
                            'Кнопка "назад" вернёт тебя в меню системы GTD </i>',
                            parse_mode='html', reply_markup=buttons(varies))
@@ -135,9 +134,10 @@ def gtd_plans(message):
     gtd_messages = select_gtd(user_id)
     print(gtd_messages)
     s, m = gtd_messages
-    bot.send_message(user_id, f'Задачи на месяц: {s}\nЗадачи на неделю: {m}')
     if s == '' and m == '':
         bot.send_message(user_id, 'У вас пока что нет планов.')
+    else:
+        bot.send_message(user_id, f'Задачи на месяц: {s}\nЗадачи на неделю: {m}')
     
 
 #POMODORO
@@ -338,7 +338,8 @@ def study_go(message):
         menu(message)
 
 def study(message):
-    msg = bot.send_message(message.chat.id, f'Поздравляем! Вы начали мини-обучение по системам планирования.',
+    msg = bot.send_message(message.chat.id, f'Поздравляем! Вы начали мини-обучение по системам планирования.\n'
+                            'Первая на очереди - GTD, отправьте любое сообщение, чтобы начать',
                            parse_mode='html', reply_markup=markup_no)
     bot.register_next_step_handler(msg, study_GTD)
 
@@ -362,9 +363,14 @@ def study_GTD(message):
         msg = bot.send_message(message.chat.id, f'https://my.mail.ru/mail/qwerve/video/8/393.html\n'
                                                 f'подробное видео о системе Getting Things Done',
                                parse_mode='html', reply_markup=buttons(learning_men))
-
+        
     elif message.text == learning_men[3]:
         bot.register_next_step_handler(msg, study_kanban)
+
+    else:
+        bot.send_message(message.chat.id, 'Выберите один из вариантов на кнопках', reply_markup=buttons(learning_men))
+        bot.register_next_step_handler(msg, study_GTD)
+        
 
 
 def study_kanban(message):
