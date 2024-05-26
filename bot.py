@@ -76,6 +76,14 @@ def menu_go(message):
         reminder_menu(message)
     elif message.text == menu_list[3]:
         study_menu(message)
+    elif message.text == men[4]:
+        a = message.chat.id
+        clean_user(a, 'gtd')
+        clean_user(a, 'kanban')
+        clean_user(a, 'matrix')
+        clean_user(a, 'reminder')
+        bot.send_message(message.chat.id, 'Готово')
+        menu(message)
     else:
         menu(message)
 
@@ -205,7 +213,7 @@ def pomodoro_go(message):
     if message.text == pomodoro_buttons[0]:
         timer_pomidoro(message)
     elif message.text == pomodoro_buttons[1]:
-        menu_go(message)
+        menu(message)
     elif message.text == pomodoro_buttons[2]:
         msg = bot.send_message(message.chat.id, f'<i>напишите числа через пробел и начнётся таймер:\n'
                                                 f'кол-во минут работы\n'
