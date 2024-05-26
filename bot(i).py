@@ -459,41 +459,43 @@ def study_gpt(message):
     bot.register_next_step_handler(msg, study_go)
 
 
-@bot.message_handler(content_types=['voice'])
+@bot.message_handler(commands=['ask_gpt_voice'])
 def voice_handler(message):
+    msg = bot.send_message(message.chat.id, 'Отправьте голосовое')
+    bot.register_next_step_handler(msg, ask_gpt_with_voice)
+
+
+
+def ask_gpt_with_voice(message):
     user_id = message.from_user.id
     file_id = message.voice.file_id
     file_info = bot.get_file(file_id)
     file = bot.download_file(file_info.file_path)
     stt_status, stt_text = stt(file)
     if not stt_status:
-        """ если что-то не так, уведомляем пользователя """
         bot.send_message(user_id, stt_text)
         return
-    """ нужна функция в бд для добавления текста """
-    stt_blocks, error_message = count_all_limits(user_id, 'stt_blocks')
+    stt_blocks = count_all_limits(user_id, 'stt_blocks')
     if not stt_blocks:
-        bot.send_message(user_id, error_message)
+        bot.send_message(user_id, stt_blocks)
         return
-    add_message(user_id=user_id, message=[stt_text, 'user', 0, 0, stt_blocks])
-
-
-@bot.message_handler(content_types=['voice'], text=['Вопрос к gpt'])
-def ask_gpt_with_voice(message):
-    user_id = message.from_user.id
+    add_message(user_id, stt_text, 'user', 0, 0, stt_blocks)
     last_message, spent_tokens = select_n_last_messages(user_id, 1)
-    total_gpt_tokens, error_message = count_all_limits(last_message, 'gpt_tokens')
-    if error_message:
-        bot.send_message(user_id, error_message)
+    all_gpt_tokens = count_all_limits(last_message, 'total_gpt_tokens')
+    if not all_gpt_tokens:
+        bot.send_message(user_id, str(all_gpt_tokens))
         return
     status_gpt, answer_gpt, tokens_in_answer = ask_gpt(last_message)
     if not status_gpt:
         bot.send_message(user_id, answer_gpt)
-    tts_symbols, error_message = count_all_limits(message, 'tts_symbols')
-    add_message(user_id=user_id, message=[answer_gpt, 'assistant', total_gpt_tokens, tts_symbols, 0])
-    if error_message:
-        bot.send_message(user_id, error_message)
+    tts_symbols = count_all_limits(message, 'tts_symbols')
+    add_message(user_id, answer_gpt, 'assistant', all_gpt_tokens, tts_symbols, 0)
+    if not tts_symbols:
+        bot.send_message(user_id, 'tts_symbols')
+        return
     bot.send_message(user_id, answer_gpt, reply_to_message_id=message.id)
-        
+
+
+bot.infinity_polling()
 
 bot.polling(non_stop=True)
