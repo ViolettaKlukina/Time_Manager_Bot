@@ -68,7 +68,7 @@ def change_plan(message):
     if message.text == Systems_plan[3]:
         pomidoro_menu(message)
     elif message.text == Systems_plan[2]:
-        pass
+        matrix_menu(message)
         insert_database(message.chat.id, Systems_plan[2])
     elif message.text == Systems_plan[1]:
         kanban_menu(message)
@@ -270,13 +270,13 @@ def kanban_insert_will_do(message):
     if message.voice:
         ans = stt(message.voice)
         if ans[0]:
-            update_row_value_kanban(message.chat.id, 'will do', ans[1])
+            update_row_value_kanban(message.chat.id, 'will_do', ans[1])
         else:
             msg = bot.send_message(message.chat.id, ans[1],
                                    parse_mode='html', reply_markup=buttons(kanban_men))
             bot.register_next_step_handler(msg, kanban_go)
     else:
-        update_row_value_kanban(message.chat.id, 'will do', message.text)
+        update_row_value_kanban(message.chat.id, 'will_do', message.text)
     msg = bot.send_message(message.chat.id, f'<i>Введи что сделано, что делается и что надо сделать:</i>',
                            parse_mode='html', reply_markup=buttons(kanban_men))
     bot.register_next_step_handler(msg, kanban_go)
@@ -395,7 +395,7 @@ def matrix_insert_non_imp_non_urg(message):
 def matrix_plans(message):
     user_id = message.from_user.id
     matrix_messages = select_matrix(user_id)
-    s, m, g, h = matrix_messages
+    s, m, g, h = matrix_messages[-1]
     bot.send_message(user_id, f'Важное срочное:\n{s}\nВажное несрочное:\n{m}\nНеважное срочное:\n{g}\nНеважное несрочное: {h}')
     if s == '' and m == '' and g == '' and h == '':
         bot.send_message(user_id, 'У вас пока что нет планов.')

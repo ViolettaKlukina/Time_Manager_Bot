@@ -337,7 +337,7 @@ def select_matrix(user_id:int):
     else:
         msg = 'Пока у Вас нет внесённых задач'
         print(msg)
-        return msg
+        return '', '', '', ''
 
 
 #REMINDER + POMODORO
