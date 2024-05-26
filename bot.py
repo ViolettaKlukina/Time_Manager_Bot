@@ -81,7 +81,7 @@ def change_plan(message):
 def reminder_menu(message):
     msg = bot.send_message(message.chat.id, 'Напишите текст или аудио для напоминалки',
                            parse_mode='html', reply_markup=buttons(reminder_men))
-    bot.register_next_step_handler(msg, change_plan)
+    bot.register_next_step_handler(msg, reminder_go)
 
 def reminder_go(message):
     if message.text == reminder_men[0]:
