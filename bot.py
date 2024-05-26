@@ -1,7 +1,7 @@
 import telebot
 from telebot import types
 from config import *
-import time
+from time import sleep
 from datetime import *
 from db import *
 from yandex_gpt import *
@@ -16,6 +16,23 @@ create_db_gtd()
 create_db_kanban()
 create_db_matrix()
 create_db_reminder()
+
+def reminder_check():
+    offset = timedelta(hours=3)
+    tz = timezone(offset, name='МСК')
+    while True:
+        time = datetime.now(tz=tz)
+        time_str = time.strftime("%d-%m-%Y %H:%M")
+        print(time_str)
+        msg_task = its_time(time_str)
+        for i in msg_task:
+            bot.send_message(i[0], i[2])
+            print('отправлено')
+
+if __name__ == '__main__':
+    p = Process(target=reminder_check)
+    p.start()
+    p.join()
 
 
 # кнопки
@@ -190,7 +207,7 @@ def pomodoro_settings(message):
 
 
 def timer_pomidoro(message, job=25, rest=5, count=3):
-    offset = timedelta(hours=0)
+    offset = timedelta(hours=3)
     tz = timezone(offset, name='МСК')
     bot.send_message(message.chat.id, 'Пора работать')
     time = datetime.now(tz=tz)
@@ -396,7 +413,7 @@ def matrix_plans(message):
     user_id = message.from_user.id
     matrix_messages = select_matrix(user_id)
     s, m, g, h = matrix_messages[-1]
-    bot.send_message(user_id, f'Важное срочное:\n{s}\nВажное несрочное:\n{m}\nНеважное срочное:\n{g}\nНеважное несрочное: {h}')
+    bot.send_message(user_id, f'Важное срочное:\n{s}\nВажное несрочное:\n{m}\nНеважное срочное:\n{g}\nНеважное несрочное:\n{h}')
     if s == '' and m == '' and g == '' and h == '':
         bot.send_message(user_id, 'У вас пока что нет планов.')
 
@@ -532,21 +549,9 @@ def study_gpt(message):
     bot.register_next_step_handler(msg, study_go)
 
 
-def reminder_check():
-    offset = timedelta(hours=3)
-    tz = timezone(offset, name='МСК')
-    while True:
-        time = datetime.now(tz=tz)
-        time_str = time.strftime("%d-%m-%Y %H:%M")
-        print(time_str)
-        msg_task = its_time(time_str)
-        for i in msg_task:
-            bot.send_message(i[0], i[2])
-            print('отправлено')
 
-if __name__ == '__main__':
-    p = Process(target=reminder_check)
-    p.start()
-    p.join()
+
+
+
 
 bot.polling()
