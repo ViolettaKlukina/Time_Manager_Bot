@@ -29,11 +29,11 @@ def reminder_check():
             print('отправлено')
         sleep(60)
 
+
 if __name__ == '__main__':
     p = Process(target=reminder_check)
     p.start()
     p.join()
-
 
 # кнопки
 def buttons(task):
@@ -46,7 +46,6 @@ def buttons(task):
 markup_no = types.ReplyKeyboardRemove()
 
 
-
 #меню и начало
 @bot.message_handler(commands=['start'])
 def handler_start(message):
@@ -56,26 +55,26 @@ def handler_start(message):
     msg = bot.send_message(message.chat.id, f'<b>Привет, {name}\n</b>'
                                                  f'<i>я бот, в котором можно выбрать удобную\n'
                                                  f'систему планирования и контролировать свои задачи</i>',
-                                     parse_mode='html', reply_markup=buttons(men))
+                                     parse_mode='html', reply_markup=buttons(menu_list))
     bot.register_next_step_handler(msg, menu_go)
 
 
 def menu(message):
     msg = bot.send_message(message.chat.id, f'<i>меню</i>',
-                           parse_mode='html', reply_markup=buttons(men))
+                           parse_mode='html', reply_markup=buttons(menu_list))
     bot.register_next_step_handler(msg, menu_go)
 
 
 def menu_go(message):
-    if message.text == men[0] or message.text == pomodoro_buttons[1]:
+    if message.text == menu_list[0] or message.text == pomodoro_buttons[1]:
         msg = bot.send_message(message.chat.id, f'<i>Выбери систему планирования</i>',
                                parse_mode='html', reply_markup=buttons(Systems_plan))
         bot.register_next_step_handler(msg, change_plan)
-    elif message.text == men[2]:
+    elif message.text == menu_list[2]:
         pomidoro_menu(message)
-    elif message.text == men[1]:
+    elif message.text == menu_list[1]:
         reminder_menu(message)
-    elif message.text == men[3]:
+    elif message.text == menu_list[3]:
         study_menu(message)
     else:
         menu(message)
@@ -85,20 +84,21 @@ def change_plan(message):
     if message.text == Systems_plan[3]:
         pomidoro_menu(message)
     elif message.text == Systems_plan[2]:
-        matrix_menu(message)
         insert_database(message.chat.id, Systems_plan[2])
+        matrix_menu(message)
     elif message.text == Systems_plan[1]:
-        kanban_menu(message)
         insert_database(message.chat.id, Systems_plan[1])
+        kanban_menu(message)
     elif message.text == Systems_plan[0]:
-        GTD_menu(message)
         insert_database(message.chat.id, Systems_plan[0])
+        GTD_menu(message)
     elif message.text == Systems_plan[4]:
         menu(message)
     else:
         msg = bot.send_message(message.chat.id, f'<i>Выбери систему планирования</i>',
                                parse_mode='html', reply_markup=buttons(Systems_plan))
         bot.register_next_step_handler(msg, change_plan)
+
 
 # Напоминалки
 def reminder_menu(message):
@@ -131,54 +131,68 @@ def reminder_time(message, text):
     insert_reminder(message.chat.id, message.text, text)
     bot.send_message(message.chat.id, 'Напоминание сохранено)')
     menu(message)
+
+
 # GTD
 def GTD_menu(message):
-    msg = bot.send_message(message.chat.id, f'<i>Поставь задачи на месяц или на неделю:</i>',
+    msg = bot.send_message(message.chat.id, f'<i>Выбери, что хочешь сделать (можешь переключаться между вариантами с помощью клавиатуры):</i>',
                            parse_mode='html', reply_markup=buttons(GTD_men))
-    insert_gtd(message.chat.id, '', '')
     bot.register_next_step_handler(msg, GTD_go)
 
 
 def GTD_go(message):
     if message.text == GTD_men[0]:
-        msg = bot.send_message(message.chat.id, f'<i>Какие задачи на месяц? (пиши по одной задаче)</i>',
+        msg = bot.send_message(message.chat.id, f'<i>Какова одна из задач на месяц?</i>',
                                parse_mode='html', reply_markup=markup_no)
-        bot.register_next_step_handler(msg, insert_gtd_main_task)
+        bot.register_next_step_handler(msg, insert_gtd_month_task)
     elif message.text == GTD_men[1]:
-        msg = bot.send_message(message.chat.id, f'<i>Какие задачи на неделю? (пиши по одной задаче)</i>',
+        msg = bot.send_message(message.chat.id, f'<i>Какова одна из задач на неделю?</i>',
                                parse_mode='html', reply_markup=markup_no)
-        bot.register_next_step_handler(msg, insert_gtd_task)
+        bot.register_next_step_handler(msg, insert_gtd_week_task)
     elif message.text == GTD_men[2]:
         gtd_plans(message)
     elif message.text == GTD_men[3]:
         menu(message)
     else:
-        msg = bot.send_message(message.chat.id, f'<i>Поставь задачи на месяц или на неделю:</i>',
+        msg = bot.send_message(message.chat.id, f'<i>Выбери, что хочешь сделать:</i>',
                                parse_mode='html', reply_markup=buttons(GTD_men))
         bot.register_next_step_handler(msg, GTD_go)
 
 
-def insert_gtd_main_task(message):
-    update_row_value_gtd(message.chat.id, 'main_task', message.text)
-    msg = bot.send_message(message.chat.id, f'<i>Введи задачу на месяц:</i>',
-                           parse_mode='html', reply_markup=buttons(GTD_men))
-    bot.register_next_step_handler(msg, GTD_go)
+def insert_gtd_month_task(message):
+    insert_gtd(message.chat.id, 'month_task', message.text)
+    msg = bot.send_message(message.chat.id, f'<i>Чтобы ввести ещё одну задачу, нажми на "ещё".\n'
+                           'Кнопка "назад" вернёт тебя в меню системы GTD </i>',
+                           parse_mode='html', reply_markup=buttons(varies))
+    bot.register_next_step_handler(msg, varies_handler)
 
 
-def insert_gtd_task(message):
-    update_row_value_gtd(message.chat.id, 'task', message.text)
-    msg = bot.send_message(message.chat.id, f'<i>Введи задачу на неделю:</i>',
-                           parse_mode='html', reply_markup=buttons(GTD_men))
-    bot.register_next_step_handler(msg, GTD_go)
+def insert_gtd_week_task(message):
+    insert_gtd(message.chat.id, 'week_task', message.text)
+    msg = bot.send_message(message.chat.id, f'<i>Чтобы ввести ещё одну задачу, нажми на "ещё".\n'
+                           'Кнопка "назад" вернёт тебя в меню системы GTD </i>',
+                           parse_mode='html', reply_markup=buttons(varies))
+    bot.register_next_step_handler(msg, varies_handler)
+
+def varies_handler(message):
+    if message.text == varies[0]:
+        bot.register_next_step_handler(message, GTD_go)
+    elif message.text == varies[1]:
+        bot.register_next_step_handler(message, change_plan)
 
 
 def gtd_plans(message):
     user_id = message.from_user.id
     gtd_messages = select_gtd(user_id)
-    s, m = gtd_messages
-    bot.send_message(user_id, f'Задачи на месяц: {s}\nЗадачи на неделю: {m}')
-    if s == '' and m == '':
+    w = []
+    m = []
+    for kon in gtd_messages:
+        w += kon[0]
+        m += kon[1]
+    if w == [] and m == []:
         bot.send_message(user_id, 'У вас пока что нет планов.')
+    else:
+        bot.send_message(user_id, f'Задачи на месяц: {';  '.join(m)}\nЗадачи на неделю: {';  '.join(w)}')
 
 
 #POMODORO
@@ -418,12 +432,14 @@ def matrix_plans(message):
     if s == '' and m == '' and g == '' and h == '':
         bot.send_message(user_id, 'У вас пока что нет планов.')
 
+
 # обучение
 def study_menu(message):
     msg = bot.send_message(message.chat.id,
                            f'Вы можете пройти мини-обучение по боту или спросить о планировании',
                            parse_mode='html', reply_markup=buttons(study_men))
     bot.register_next_step_handler(msg, study_go)
+
 
 def study_go(message):
     if message.text == study_men[0]:
@@ -437,7 +453,7 @@ def study_go(message):
         menu(message)
 
 def study(message):
-    msg = bot.send_message(message.chat.id, f'Поздравляем! Вы начали мини-обучение по системам планирования. (Напишите любой текст, чтоб продолжить)',
+    msg = bot.send_message(message.chat.id, f'Поздравляем! Вы начали мини-обучение по системам планирования. (Напишите любой текст, чтобы продолжить)',
                            parse_mode='html', reply_markup=markup_no)
     bot.register_next_step_handler(msg, study_GTD)
 
@@ -463,8 +479,10 @@ def study_GTD(message):
         msg = bot.send_message(message.chat.id, f'https://my.mail.ru/mail/qwerve/video/8/393.html\n'
                                                 f'подробное видео о системе Getting Things Done',
                                parse_mode='html', reply_markup=buttons(learning_men))
-
+        
     elif message.text == learning_men[3]:
+        msg = bot.send_message(message.chat.id, 'Напишите любой текст, чтобы продолжить',
+                           parse_mode='html', reply_markup=markup_no)
         bot.register_next_step_handler(msg, study_kanban)
 
 
@@ -490,6 +508,8 @@ def study_kanban(message):
                                parse_mode='html', reply_markup=buttons(learning_men))
 
     elif message.text == learning_men[3]:
+        msg = bot.send_message(message.chat.id, 'Напишите любой текст, чтобы продолжить',
+                           parse_mode='html', reply_markup=markup_no)
         bot.register_next_step_handler(msg, study_matrix)
 
 def study_matrix(message):
@@ -518,6 +538,8 @@ def study_matrix(message):
                                parse_mode='html', reply_markup=buttons(learning_men))
 
     elif message.text == learning_men[3]:
+        msg = bot.send_message(message.chat.id, 'Напишите любой текст, чтобы продолжить',
+                           parse_mode='html', reply_markup=markup_no)
         bot.register_next_step_handler(msg, study_pomodoro)
 
 
@@ -546,6 +568,8 @@ def study_pomodoro(message):
                                parse_mode='html', reply_markup=buttons(learning_men))
 
     elif message.text == learning_men[3]:
+        msg = bot.send_message(message.chat.id, 'Напишите любой текст, чтобы продолжить',
+                           parse_mode='html', reply_markup=markup_no)
         bot.register_next_step_handler(msg, study_menu)
 
 
