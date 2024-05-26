@@ -33,28 +33,30 @@ markup_no = types.ReplyKeyboardRemove()
 #меню и начало
 @bot.message_handler(commands=['start'])
 def handler_start(message):
+    insert_kanban(message.chat.id, '', '', '')
+    insert_matrix(message.chat.id, '', '', '', '')
     name = message.chat.first_name
     msg = bot.send_message(message.chat.id, f'<b>Привет, {name}\n</b>'
                                                  f'<i>я бот, в котором можно выбрать удобную\n'
                                                  f'систему планирования и контролировать свои задачи</i>',
-                                     parse_mode='html', reply_markup=buttons(menu))
+                                     parse_mode='html', reply_markup=buttons(men))
     bot.register_next_step_handler(msg, menu_go)
 
 
 def menu(message):
     msg = bot.send_message(message.chat.id, f'<i>меню</i>',
-                           parse_mode='html', reply_markup=buttons(menu))
+                           parse_mode='html', reply_markup=buttons(men))
     bot.register_next_step_handler(msg, menu_go)
 
 
 def menu_go(message):
-    if message.text == menu[0] or message.text == pomodoro_buttons[1]:
+    if message.text == men[0] or message.text == pomodoro_buttons[1]:
         msg = bot.send_message(message.chat.id, f'<i>Выбери систему планирования</i>',
                                parse_mode='html', reply_markup=buttons(Systems_plan))
         bot.register_next_step_handler(msg, change_plan)
-    elif message.text == menu[2]:
+    elif message.text == men[2]:
         pomidoro_menu(message)
-    elif message.text == menu[1]:
+    elif message.text == men[1]:
         pass
 
 
@@ -63,13 +65,13 @@ def change_plan(message):
         pomidoro_menu(message)
     elif message.text == Systems_plan[2]:
         pass
-        insert_database([message.chat.id, Systems_plan[2]])
+        insert_database(message.chat.id, Systems_plan[2])
     elif message.text == Systems_plan[1]:
         kanban_menu(message)
-        insert_database([message.chat.id, Systems_plan[1]])
+        insert_database(message.chat.id, Systems_plan[1])
     elif message.text == Systems_plan[0]:
         GTD_menu(message)
-        insert_database([message.chat.id, Systems_plan[0]])
+        insert_database(message.chat.id, Systems_plan[0])
     elif message.text == Systems_plan[4]:
         menu(message)
     else:
@@ -126,9 +128,9 @@ def GTD_go(message):
                                parse_mode='html', reply_markup=markup_no)
         bot.register_next_step_handler(msg, insert_gtd_task)
     elif message.text == GTD_men[2]:
-        menu(message)
-    elif message.text == GTD_men[3]:
         gtd_plans(message)
+    elif message.text == GTD_men[3]:
+        menu(message)
     else:
         msg = bot.send_message(message.chat.id, f'<i>Поставь задачи на месяц или на неделю:</i>',
                                parse_mode='html', reply_markup=buttons(GTD_men))
@@ -203,7 +205,6 @@ def timer_pomidoro(message, job=25, rest=5, count=3):
 def kanban_menu(message): #
     msg = bot.send_message(message.chat.id, f'<i>Введи что сделано, что делается и что надо сделать:</i>',
                      parse_mode='html', reply_markup=buttons(kanban_men))
-    insert_kanban([message.chat.id, '', '', ''])
     bot.register_next_step_handler(msg, kanban_go)
 
 def kanban_go(message):
@@ -278,8 +279,8 @@ def kanban_insert_will_do(message):
 
 def kanban_plans(message):
     user_id = message.from_user.id
-    matrix_messages = select_matrix(user_id)
-    s, m, g = matrix_messages
+    matrix_messages = select_kanban(user_id)
+    s, m, g = matrix_messages[-1]
     bot.send_message(user_id,
                      f'Что сделано:\n{s}\nЧто делается:\n{m}\nЧто надо сделать:\n{g}')
     if s == '' and m == '' and g == '':
@@ -290,7 +291,6 @@ def kanban_plans(message):
 def matrix_menu(message):
     msg = bot.send_message(message.chat.id, f'Введите задачи: важные срочные, важные несрочные, неважные срочные, неважные несрочные.',
                             parse_mode='html', reply_markup=buttons(matrix_men))
-    insert_matrix([message.chat.id, '', '', '', ''])
     bot.register_next_step_handler(msg, matrix_go)
 
 
@@ -338,7 +338,16 @@ def matrix_insert_imp_urg(message):
 
 
 def matrix_insert_imp_non_urg(message):
-    update_row_value_matrix(message.chat.id, 'imp_nonur', message.text)
+    if message.voice:
+        ans = stt(message.voice)
+        if ans[0]:
+            update_row_value_kanban(message.chat.id, 'imp_nonur', ans[1])
+        else:
+            msg = bot.send_message(message.chat.id, ans[1],
+                                   parse_mode='html', reply_markup=buttons(matrix_men))
+            bot.register_next_step_handler(msg, kanban_go)
+    else:
+        update_row_value_matrix(message.chat.id, 'imp_nonur', message.text)
     msg = bot.send_message(message.chat.id,
                            f'Введите задачи: важные срочные, важные несрочные, неважные срочные, неважные несрочные.',
                            parse_mode='html', reply_markup=buttons(matrix_men))
@@ -346,7 +355,16 @@ def matrix_insert_imp_non_urg(message):
 
 
 def matrix_insert_non_imp_urg(message):
-    update_row_value_matrix(message.chat.id, 'unimp_urg', message.text)
+    if message.voice:
+        ans = stt(message.voice)
+        if ans[0]:
+            update_row_value_kanban(message.chat.id, 'unimp_urg', ans[1])
+        else:
+            msg = bot.send_message(message.chat.id, ans[1],
+                                   parse_mode='html', reply_markup=buttons(matrix_men))
+            bot.register_next_step_handler(msg, kanban_go)
+    else:
+        update_row_value_matrix(message.chat.id, 'unimp_urg', message.text)
     msg = bot.send_message(message.chat.id,
                            f'Введите задачи: важные срочные, важные несрочные, неважные срочные, неважные несрочные.',
                            parse_mode='html', reply_markup=buttons(matrix_men))
@@ -354,7 +372,16 @@ def matrix_insert_non_imp_urg(message):
 
 
 def matrix_insert_non_imp_non_urg(message):
-    update_row_value_matrix(message.chat.id, 'unimp_urg', message.text)
+    if message.voice:
+        ans = stt(message.voice)
+        if ans[0]:
+            update_row_value_kanban(message.chat.id, 'unimp_nonurg', ans[1])
+        else:
+            msg = bot.send_message(message.chat.id, ans[1],
+                                   parse_mode='html', reply_markup=buttons(matrix_men))
+            bot.register_next_step_handler(msg, kanban_go)
+    else:
+        update_row_value_matrix(message.chat.id, 'unimp_nonurg', message.text)
     msg = bot.send_message(message.chat.id,
                            f'Введите задачи: важные срочные, важные несрочные, неважные срочные, неважные несрочные.',
                            parse_mode='html', reply_markup=buttons(matrix_men))
