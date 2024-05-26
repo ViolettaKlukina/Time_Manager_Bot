@@ -57,7 +57,11 @@ def menu_go(message):
     elif message.text == men[2]:
         pomidoro_menu(message)
     elif message.text == men[1]:
-        pass
+        reminder_menu(message)
+    elif message.text == men[3]:
+        study_menu(message)
+    else:
+        menu(message)
 
 
 def change_plan(message):
