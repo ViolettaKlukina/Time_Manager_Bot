@@ -76,7 +76,7 @@ def menu_go(message):
         reminder_menu(message)
     elif message.text == menu_list[3]:
         study_menu(message)
-    elif message.text == men[4]:
+    elif message.text == menu_list[4]:
         a = message.chat.id
         clean_user(a, 'gtd')
         clean_user(a, 'kanban')
@@ -200,7 +200,10 @@ def gtd_plans(message):
     if w == [] and m == []:
         bot.send_message(user_id, 'У вас пока что нет планов.')
     else:
-        bot.send_message(user_id, f'Задачи на месяц: {';  '.join(m)}\nЗадачи на неделю: {';  '.join(w)}')
+        w_str = str(w)[:-1]
+        m_str = str(m)[:-1]
+        bot.send_message(user_id, f'Задачи на месяц: {m_str} .\n'
+                        f'Задачи на неделю: {w_str} .')
 
 
 #POMODORO
@@ -213,7 +216,7 @@ def pomodoro_go(message):
     if message.text == pomodoro_buttons[0]:
         timer_pomidoro(message)
     elif message.text == pomodoro_buttons[1]:
-        menu(message)
+        menu_go(message)
     elif message.text == pomodoro_buttons[2]:
         msg = bot.send_message(message.chat.id, f'<i>напишите числа через пробел и начнётся таймер:\n'
                                                 f'кол-во минут работы\n'
